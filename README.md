@@ -196,13 +196,8 @@ Enter username: example_user
 
 ## Results
 
-Search results are saved automatically in the `resultados_osint/` directory.
-
-The application generates:
-
-- HTML reports.
-- JSON reports.
-- Organized investigation folders.
+Search results are displayed directly in the terminal. The application does not
+create a separate results directory or generate report files.
 
 ## Technologies
 

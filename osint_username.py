@@ -1,64 +1,81 @@
 
 import subprocess
 import sys
-import os
-from pathlib import Path
-from datetime import datetime
 
-def buscar_username():
+def executar_busca():
+
     print("=" * 55)
-    print("       OSINT - BUSCADOR DE USERNAMES")
+    print("          OSINT USERNAME SCANNER")
     print("=" * 55)
 
-    username = input("\nDigite o nome de usuário: ").strip()
+    username = input("\nDigite o username: ").strip()
 
     if not username:
-        print("[!] Informe um username válido.")
+        print("\n[!] Username inválido.")
         return
 
-    # Pasta onde os resultados serão armazenados
-    pasta = Path("resultados_osint")
-    pasta.mkdir(exist_ok=True)
+    print("\nEscolha o tipo de pesquisa:")
+    print("\n[1] Busca rápida - 50 sites populares")
+    print("[2] Busca profunda - Todos os sites disponíveis")
+    print("[0] Sair")
 
-    # Nome da pasta para esta pesquisa
-    horario = datetime.now().strftime("%Y%m%d_%H%M%S")
-    destino = pasta / f"{username}_{horario}"
+    opcao = input("\nSelecione uma opção: ").strip()
 
-    destino.mkdir(exist_ok=True)
+    if opcao == "0":
+        print("\nEncerrando...")
+        return
 
-    print(f"\n[+] Iniciando pesquisa para: {username}")
-    print("[+] Consultando todos os sites cadastrados...")
-    print("[+] Isso pode levar alguns minutos.\n")
+    if opcao == "1":
+        argumentos = ["--top-sites", "50"]
+        modo = "BUSCA RAPIDA"
+
+    elif opcao == "2":
+        argumentos = ["--all-sites"]
+        modo = "BUSCA PROFUNDA"
+
+    else:
+        print("\n[!] Opção inválida.")
+        return
 
     comando = [
         sys.executable,
-        "-m", "maigret",
+        "-m",
+        "maigret",
         username,
-        "-a",
-        "--html",
-        "--json", "simple",
-        "--folderoutput", str(destino)
+        *argumentos,
+        "--no-extracting",
+        "--no-recursion",
+        "--folderoutput",
+        ".",
     ]
 
+    print("\n" + "=" * 55)
+    print("INICIANDO INVESTIGAÇÃO")
+    print("=" * 55)
+
+    print(f"\nUsername: {username}")
+    print(f"Modo: {modo}")
+    print("\n[+] Procurando perfis disponíveis...")
+    print("[+] Exibindo resultados diretamente no terminal.\n")
+
     try:
-        resultado = subprocess.run(comando)
+        resultado = subprocess.run(comando, check=False)
+
+        print("\n" + "=" * 55)
 
         if resultado.returncode == 0:
-            print("\n[+] Pesquisa finalizada!")
-            print(f"[+] Resultados salvos em: {destino.resolve()}")
+            print("[+] PESQUISA FINALIZADA")
         else:
-            print("\n[!] A pesquisa terminou com avisos ou erros.")
-            print("Verifique a instalação e a conexão.")
+            print("[!] Pesquisa finalizada com erros.")
 
-    except FileNotFoundError:
-        print("[!] Python ou Maigret não encontrado.")
+        print("=" * 55)
 
     except KeyboardInterrupt:
-        print("\n[!] Pesquisa interrompida pelo usuário.")
+        print("\n[!] Pesquisa interrompida.")
 
     except Exception as erro:
-        print(f"[!] Erro inesperado: {erro}")
+        print(f"\n[!] Erro: {erro}")
 
 
 if __name__ == "__main__":
-    buscar_username()
+    executar_busca()
